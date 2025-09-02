@@ -1,0 +1,113 @@
+html, body {
+   display: flex;
+   justify-content: center;
+   height: 100%;
+}
+
+body, div, form, input {
+   padding: 0;
+   margin: 0;
+   outline: none;
+   font-family: Roboto, Arial, sans-serif;
+   font-size: 16px;
+   color: #666;
+}
+
+hr {
+   color: #a9a9a9;
+   opacity: 0.3;
+}
+
+.main-block {
+   max-width: 340px;
+   min-height: 400px;
+   padding: 10px 0;
+   margin: auto;
+   border-radius: 5px;
+   border: solid 1px #ccc;
+   box-shadow: 1px 2px 5px rgba(0,0,0,.31);
+   background: #ebebeb;
+   text-align: center;
+}
+
+form {
+   margin: 0 30px;
+}
+
+label#icon {
+   margin: 0;
+   border-radius: 5px 0 0 5px;
+}
+
+input[type=text], input[type=password] {
+   width: calc(100% - 57px);
+   height: 36px;
+   margin: 13px 0 0 -5px;
+   padding-left: 10px;
+   border-radius: 0 5px 5px 0;
+   border: solid 1px #cbc9c9;
+   box-shadow: 1px 2px 5px rgba(0,0,0,.09);
+   background: #fff;
+}
+
+#icon {
+   display: inline-block;
+   padding: 9.3px 15px;
+   box-shadow: 1px 2px 5px rgba(0,0,0,.09);
+   background: #1c87c9;
+   color: #fff;
+   text-align: center;
+}
+
+.switch-field {
+   display: flex;
+   padding-top: 20px;
+   overflow: hidden;
+   justify-content: center;
+}
+
+.switch-field input {
+   position: absolute !important;
+   clip: rect(0, 0, 0, 0);
+   height: 1px;
+   width: 1px;
+   border: 0;
+   overflow: hidden;
+}
+
+.switch-field label {
+   background-color: #fff;
+   color: rgba(0, 0, 0, 0.6);
+   font-size: 14px;
+   line-height: 1;
+   text-align: center;
+   padding: 8px 16px;
+   margin-right: -1px;
+   border: 1px solid rgba(0, 0, 0, 0.2);
+   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+   transition: all 0.1s ease-in-out;
+}
+
+.switch-field span {
+   width: 70px;
+   padding-top: 5px;
+   font-weight: 500;
+}
+
+.switch-field label:hover {
+   cursor: pointer;
+}
+
+.switch-field input:checked + label {
+   background-color: #1C87C9;
+   box-shadow: none;
+   color: white;
+}
+
+.switch-field label:first-of-type {
+   border-radius: 4px 0 0 4px;
+}
+
+.switch-field label:last-of-type {
+   border-radius: 0 4px 4px 0;
+}
