@@ -4,7 +4,7 @@ html, body {
    height: 100%;
 }
 
-body, div, form, input {
+body, div, form, input, textarea {
    padding: 0;
    margin: 0;
    outline: none;
@@ -19,95 +19,237 @@ hr {
 }
 
 .main-block {
-   max-width: 340px;
-   min-height: 400px;
-   padding: 10px 0;
+   padding: 0;
    margin: auto;
-   border-radius: 5px;
-   border: solid 1px #ccc;
-   box-shadow: 1px 2px 5px rgba(0,0,0,.31);
-   background: #ebebeb;
+   border: solid 1px #666;
    text-align: center;
+   min-width: 450px;
+}
+
+.main-block span {
+   margin-left: 15px;
+   margin-right: 15px;
+}
+
+header{
+   background-color: gray;
+   flex: auto;
+   padding: 5px 10px;
+   display: flex;
+   text-align: left;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 15px;
+}
+
+
+header img{
+   margin-top: -9px;
+   width: 60px;
+}
+
+header h3{
+   color: white;
+   font-size: 14px;
+   margin: 0;
+   padding: 12px;
+}
+
+#content{
+   margin: 15px 10px 20px 10px;
+}
+
+#content p{
+   font-size: 0.9em;
+   padding: 10px;
 }
 
 form {
-   margin: 0 30px;
+   text-align: left;
 }
 
-label#icon {
-   margin: 0;
-   border-radius: 5px 0 0 5px;
-}
-
-input[type=text], input[type=password] {
-   width: calc(100% - 57px);
-   height: 36px;
-   margin: 13px 0 0 -5px;
-   padding-left: 10px;
-   border-radius: 0 5px 5px 0;
-   border: solid 1px #cbc9c9;
-   box-shadow: 1px 2px 5px rgba(0,0,0,.09);
-   background: #fff;
-}
-
-#icon {
-   display: inline-block;
-   padding: 9.3px 15px;
-   box-shadow: 1px 2px 5px rgba(0,0,0,.09);
-   background: #1c87c9;
-   color: #fff;
-   text-align: center;
-}
-
-.switch-field {
+fieldset{
    display: flex;
-   padding-top: 20px;
-   overflow: hidden;
+   margin-top: 10px;
+   border: 1px solid grey;
+   padding: 5px 10px;
+}
+
+
+.fs-column{
+   flex-direction: column;
+}
+
+.fs-center{
    justify-content: center;
 }
 
+
+legend{
+   font-size: 11px;
+   font-weight: 300;
+}
+
+input{
+   padding: 7px;
+   border: none;
+}
+
+input.invalid {
+   border-color: red;
+}
+
+.error-msg {
+   color: red;
+   font-size: 0.8em;
+}
+
+textarea{
+   padding: 10px;
+   margin-top: 10px;
+   width: 94%;
+}
+
+.content-select{
+	position: relative;
+}
+
+fieldset select{
+	display: inline-block;
+   margin-left: 10px;
+	width: 100%;
+	cursor: pointer;
+  	padding: 7px 10px;
+  	height: 42px;
+  	outline: 0; 
+   font-weight: 500;
+   font-size: 13px;
+	color: #999;
+	font-family: 
+	'Quicksand', sans-serif;
+	border:2px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+/* 
+Creamos la fecha que aparece a la izquierda del select.
+Realmente este elemento es un cuadrado que sólo tienen
+dos bordes con color y que giramos con transform: rotate(-45deg);
+*/
+#expireDateModifierDiv select i{
+   position: absolute;
+   right: 25px;
+   top: calc(50% - 10px);
+   width: 10px;
+   height: 10px;
+   display: block;
+   border-left: 3px solid red;
+   border-bottom: 3px solid red;
+   transform: rotate(-45deg);
+   transition: all 0.25s ease;
+}
+
+.content-select:hover i{
+	margin-top: 3px;
+}
+
+
+.flag{
+   width: 32px;
+   float: right;
+   border: 3px solid;
+   border-radius: 50%;
+   padding: 3px;
+   margin-right: 2px;
+}
+
+.flag:hover{
+   border-color: #9c9c9c;
+}
+
+.flag-selected{
+   border-color: #ef3829;
+}
+
+.flag-no-selected{
+   border-color: #FFF;
+}
+
+.switch-field {
+	display: flex;
+	overflow: hidden;
+}
+
+#switch-send{
+   width: 150px;
+}
+
 .switch-field input {
-   position: absolute !important;
-   clip: rect(0, 0, 0, 0);
-   height: 1px;
-   width: 1px;
-   border: 0;
-   overflow: hidden;
+	position: absolute !important;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	width: 1px;
+	border: 0;
+	overflow: hidden;
 }
 
 .switch-field label {
-   background-color: #fff;
-   color: rgba(0, 0, 0, 0.6);
-   font-size: 14px;
-   line-height: 1;
-   text-align: center;
-   padding: 8px 16px;
-   margin-right: -1px;
-   border: 1px solid rgba(0, 0, 0, 0.2);
-   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
-   transition: all 0.1s ease-in-out;
+	background-color: #e4e4e4;
+	font-size: 14px;
+   font-weight: 600;
+	line-height: 1;
+	text-align: center;
+	padding: 8px 16px;
+	margin-right: -1px;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	transition: all 0.1s ease-in-out;
 }
-
-.switch-field span {
-   width: 70px;
-   padding-top: 5px;
-   font-weight: 500;
+.switch-field label i {
+   padding: 5px;
 }
 
 .switch-field label:hover {
-   cursor: pointer;
+	cursor: pointer;
 }
 
 .switch-field input:checked + label {
-   background-color: #1C87C9;
-   box-shadow: none;
    color: white;
+   background-color: #ef3829;
+	box-shadow: none;
 }
 
 .switch-field label:first-of-type {
-   border-radius: 4px 0 0 4px;
+	border-radius: 7px 0 0 7px;
 }
 
 .switch-field label:last-of-type {
-   border-radius: 0 4px 4px 0;
+	border-radius: 0 7px 7px 0;
+}
+
+#expireDateModifierDiv {
+   margin-left: 15px;
+   align-items: center;
+}
+
+#dataExtensionModeOptionsDiv input{
+   border: 1px solid grey;
+   margin-top: 10px;
+   width: 94%;
+}
+
+#dependentModeOptionsDiv select{
+   margin: 0;
+}
+
+#messageActivity{
+   margin: 10px 0 !important;
+}
+
+#variables-fieldset {
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   padding-bottom: 10px;
 }

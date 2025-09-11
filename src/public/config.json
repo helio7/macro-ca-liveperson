@@ -8,15 +8,19 @@
     "type": "REST",
     "lang": {
         "en-US": {
-            "name": "DINAMICALLY_REPLACED",
-            "description": "Envía un mensaje de WhatsApp a un cliente.",
+            "name": "Enviar WhatsApp - Apigee",
+            "description": "Envía un mensaje de WhatsApp a un cliente, usando el servicio de Apigee.",
             "step1Label": "Configure Activity"
         }
     },
     "arguments": {
         "execute": {
             "inArguments": [
-                { "phoneNumber": "" }
+                { "dataExtension": "" },
+                { "campaignName": "" },
+                { "templateId": "" },
+                { "phoneNumber": "" },
+                { "variables": "" }
             ],
             "outArguments": [
                 { "success": false }
@@ -67,7 +71,27 @@
             "execute": {
                 "inArguments": [
                     {
+                        "dataExtension": {
+                            "dataType": "Text",
+                            "isNullable": true,
+                            "direction": "in"
+                        },
+                        "campaignName": {
+                            "dataType": "Text",
+                            "isNullable": true,
+                            "direction": "in"
+                        },
+                        "templateId": {
+                            "dataType": "Text",
+                            "isNullable": true,
+                            "direction": "in"
+                        },
                         "phoneNumber": {
+                            "dataType": "Text",
+                            "isNullable": true,
+                            "direction": "in"
+                        },
+                        "variables": {
                             "dataType": "Text",
                             "isNullable": true,
                             "direction": "in"

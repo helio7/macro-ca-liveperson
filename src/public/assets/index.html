@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Envío de WhatsApp a cliente</title>
+        <title>Enviar WhatsApp - Apigee</title>
         <meta charset="utf-8" />
         <meta http-equiv="x-ua-compatible" content="ie-edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,7 +9,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel='stylesheet' href="css/styles.css">
         <script type="text/javascript" src="js/require.js"></script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="js/require.js"></script>
+        <script> var $jq = jQuery.noConflict(); </script>
         <script type="text/javascript">
             (function() {
                 var config = {
@@ -24,8 +26,81 @@
     </head>
     <body>
         <div class="main-block">
-            <h3>Envío de WhatsApp a cliente</h3>
-            <span class="description-span">Envía un mensaje de WhatsApp a un cliente.</span>
+            <header>
+                <h3>Enviar WhatsApp - Apigee</h3>
+            </header>
+            <span class="description-span">Envía un mensaje de WhatsApp a un cliente, usando el servicio de Apigee.</span>
+            <section id="content">
+                <form action="/">
+                    <fieldset>
+                        <legend>Data Extension</legend>
+                        <input type="text" name="dataExtension" id="dataExtension" placeholder="Nombre de Data Extension"
+                            style="width: 60%;" class="text-input">
+                    </fieldset>
+                    <fieldset>
+                        <legend>Campaña</legend>
+                        <input type="text" name="campaignName" id="campaignName" placeholder="Nombre de campaña"
+                            style="width: 60%;" class="text-input">
+                    </fieldset>
+                    <fieldset>
+                        <legend>Plantilla</legend>
+                        <input type="text" name="templateId" id="templateId" placeholder="ID de plantilla"
+                            style="width: 60%;" class="text-input">
+                    </fieldset>
+                    <fieldset id="variables-fieldset">
+                        <legend>Variables</legend>
+                        <div>
+                            <button onclick="addItem('', '')">Agregar Variable</button>
+                            <button hidden id="button-that-removes-items" onclick="removeLastItem()">Quitar Variable</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </section>
         </div>
     </body>
+    <script>
+        let numberOfItems = 0;
+        const removeLastItem = () => {
+            const itemNumber = String(numberOfItems);
+            const groupDivToRemove = document.getElementById('group-' + itemNumber);
+            groupDivToRemove.remove();
+
+            numberOfItems--;
+
+            if (numberOfItems === 0) {
+                document.getElementById('button-that-removes-items').hidden = true;
+            }
+        }
+        const addItem = (variableName, dataExtensionColumnName) => {
+            numberOfItems++;
+
+            const itemNumber = String(numberOfItems);
+
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'variable-item';
+            groupDiv.id = 'group-' + itemNumber;
+
+            const span = document.createElement('span');
+            span.innerText = 'Variable ' + itemNumber + ':';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'dataExtensionColumnName';
+            input.placeholder = 'Nombre de columna en D.E.';
+            input.value = dataExtensionColumnName;
+            input.className = 'text-input';
+            input.setAttribute('required', '');
+
+            groupDiv.appendChild(span);
+            groupDiv.appendChild(input);
+
+            const variablesFieldset = document.getElementById('variables-fieldset');
+
+            variablesFieldset.appendChild(groupDiv);
+
+            if (numberOfItems === 1) {
+                document.getElementById('button-that-removes-items').hidden = false;
+            }
+        }
+    </script>
 </html>

@@ -1,10 +1,10 @@
-let connection;
-
 define(['postmonger'], (Postmonger) => {
     'use strict';
 
-    connection = new Postmonger.Session();
-    let activity;
+    let $ = jQuery.noConflict(); // Evitar conflicto con otras versiones de jQuery
+    let connection = new Postmonger.Session();
+
+    let activity = {};
 
     // Configuration variables
     let eventDefinitionKey;
@@ -20,15 +20,64 @@ define(['postmonger'], (Postmonger) => {
 
     connection.on('initActivity', (data) => {
         if (data) activity = data;
+
+        const inArguments = Boolean(
+            data.arguments &&
+            data.arguments.execute &&
+            data.arguments.execute.inArguments &&
+            data.arguments.execute.inArguments.length > 0
+        ) ? data.arguments.execute.inArguments : [];
+
+        console.log('inArguments when initActivity:', inArguments);
+
+        const dataExtensionArg = inArguments.find(arg => arg.dataExtension);
+        if (dataExtensionArg) document.getElementById('dataExtension').value = dataExtensionArg.dataExtension;
+
+        const campaignNameArg = inArguments.find(arg => arg.campaignName);
+        if (campaignNameArg) document.getElementById('campaignName').value = campaignNameArg.campaignName;
+
+        const templateIdArg = inArguments.find(arg => arg.templateId);
+        if (templateIdArg) document.getElementById('templateId').value = templateIdArg.templateId;
+
+        const phoneNumberArg = inArguments.find(arg => arg.phoneNumber);
+        if (phoneNumberArg) document.getElementById('phoneNumber').value = phoneNumberArg.phoneNumber;
+
+        const variablesArg = inArguments.find(arg => arg.fields);
+        if (variablesArg) {
+            const parsedVariables = deserializeString(variablesArg.variables);
+            for (const parsedVariable in parsedVariables) {
+                addItem(
+                    parsedVariable,
+                    parsedVariables[parsedVariable],
+                );
+            }
+        }
     });
 
-    connection.on('requestedInteraction', (payload) => {});
-
     connection.on('clickedNext', () => { // Save function within MC.
-        const phoneNumber = `{{Contact.Attribute."NOMBRE_DE_DATA_EXTENSION".NUMERO_DE_TELEFONO}}`;
+        const dataExtension = document.getElementById('dataExtension').value;
+        const campaignName = document.getElementById('campaignName').value;
+        const templateId = document.getElementById('templateId').value;
+        const phoneNumber = `{{Contact.Attribute."${dataExtension}".phoneNumber}}`;
+
+        const groupDivs = document.querySelectorAll('.variable-item');
+        const variablesObject = {};
+        for (const groupDiv of groupDivs) {
+            const input = groupDiv.querySelector('input');
+            const variableNumber = groupDiv.id.split('group-')[1];
+            const dataExtensionColumnName = input.value;
+            variablesObject[variableNumber] = `{{Contact.Attribute."${dataExtension}".${dataExtensionColumnName}}}`;
+        }
+        const variables = serializeObject(variablesObject);
+
         activity['arguments'].execute.inArguments = [
+            { dataExtension: dataExtension ? dataExtension : null },
+            { campaignName: campaignName ? campaignName : null },
+            { templateId: templateId ? templateId : null },
             { phoneNumber: phoneNumber ? phoneNumber : null },
+            { variables: variables ? variables : null },
         ];
+
         activity['metaData'].isConfigured = true;
         connection.trigger('updateActivity', activity);
     });
@@ -41,4 +90,23 @@ define(['postmonger'], (Postmonger) => {
         console.log("Requested TriggerEventDefinition", eventDefinitionModel.eventDefinitionKey);
         if (eventDefinitionModel) eventDefinitionKey = eventDefinitionModel.eventDefinitionKey;
     });
+
+    connection.on('requestedTriggerEventDefinition', (eventDefinitionModel) => {
+        if (eventDefinitionModel) eventDefinitionKey = eventDefinitionModel.eventDefinitionKey;
+    });
 });
+
+function serializeObject(obj) {
+    return Object.entries(obj)
+        .map(([key, value]) => `${key}=${value}`)
+        .join(';');
+}
+
+function deserializeString(str) {
+    const result = {};
+    str.split(';').forEach(pair => {
+      const [key, ...rest] = pair.split('=');
+      result[key] = rest.join('='); // Handles '=' inside the value
+    });
+    return result;
+}

@@ -47,7 +47,10 @@ const logData = (req: Request) => {
 import axios from 'axios';
 
 interface InputParamenter {
+    campaignName?: string;
+    templateId?: string;
     phoneNumber?: string;
+    variables?: string;
 }
 interface DecodedBody {
     inArguments?: InputParamenter[];
@@ -56,13 +59,10 @@ interface DecodedBody {
 const {
     env: {
         SALESFORCE_JWT_SECRET,
-        SENTINEL_SERVICE_DOMAIN,
-        CLIENT_ID,
-        CLIENT_SECRET,
+        API_BASE_URL,
+        AUTH_KEY,
+        AUTH_SECRET,
         ACCOUNT_ID,
-        PROACTIVE_MESSAGGING_API_DOMAIN,
-        CAMPAIGN_NAME,
-        TEMPLATE_ID,
         OUTBOUND_NUMBER,
     },
 } = process;
@@ -99,85 +99,90 @@ const execute = async function (req: Request, res: Response) {
                 const decoded: DecodedBody = { ..._decoded };
 
                 if (decoded.inArguments && decoded.inArguments.length > 0) {
+                    let campaignName: string | null = null;
+                    let templateId: string | null = null;
                     let phoneNumber: string | null = null;
+                    let variables: string | null = null;
                     for (const argument of decoded.inArguments) {
+                        if (argument.campaignName) campaignName = argument.campaignName;
+                        if (argument.templateId) templateId = argument.templateId;
                         if (argument.phoneNumber) phoneNumber = argument.phoneNumber;
+                        if (argument.variables) variables = argument.variables;
                     }
-                    if (!phoneNumber) return res.status(400).send('Input parameter is missing.');
+                    if (!campaignName || !templateId || !phoneNumber || !variables) return res.status(400).send('Input parameter is missing.');
+
+                    console.log('CAMPAIGN NAME:', campaignName);
+                    console.log('TEMPLATE ID:', templateId);
+                    console.log('PHONE NUMBER:', phoneNumber);
+                    console.log('UNPARSED VARIABLES:', variables);
+
+                    const parsedVariables = deserializeString(variables);
+                    console.log('PARSED VARIABLES:', variables);
+
+                    const variablesNumber = Object.keys(parsedVariables).length;
+                    if (variablesNumber) {
+                        // Check for null, undefined, or empty string values in parsedVariables
+                        for (const [key, value] of Object.entries(parsedVariables)) {
+                            if (!value) return res.status(400).send(`Value for variable "${key}" is invalid: ${value}.`);
+                        }
+                    }
 
                     const params = new URLSearchParams();
-                    params.append('client_id', CLIENT_ID!);
-                    params.append('client_secret', CLIENT_SECRET!);
-
+                    params.append('scope', 'openid');
+                    params.append('grant_type', 'client_credentials');
                     const authenticationResponse: { data: { access_token: string } } | null = await axios.post(
-                        `https://${SENTINEL_SERVICE_DOMAIN}/sentinel/api/account/${ACCOUNT_ID}/app/token?v=1.0&grant_type=client_credentials`,
+                        `${API_BASE_URL}/v1/oauth/access`,
                         params,
-                    )
+                        { auth: { username: AUTH_KEY!, password: AUTH_SECRET! },
+                    })
                         .catch((err) => {
                             if (err.response) {
                                 const { data, status } = err.response;
-                                specialConsoleLog(phoneNumber!, 'AUTHENTICATION_REQUEST_FAILED', { data, status });
+                                specialConsoleLog('AUTHENTICATION_REQUEST_FAILED', { data, status });
                             }
                             console.log('Error when calling the authentication API.');
                             return null;
                         });
                     if (!authenticationResponse) return res.send({ success: false });
-
+                    
                     const { data: { access_token } } = authenticationResponse!;
 
                     const result: {
                         success: boolean,
-                        satisfied: boolean,
-                    } = await axios.post(`https://${PROACTIVE_MESSAGGING_API_DOMAIN}/api/v2/account/${ACCOUNT_ID}/campaign`, {
-                        headers: {
-                            Authorization: `Bearer ${access_token}`,
-                            'Content-Type': 'application/json',
-                        },
-                        data: {
-                            campaignName: CAMPAIGN_NAME,
-                            skill: 'WhatsApp',
-                            templateId: TEMPLATE_ID,
-                            outboundNumber: OUTBOUND_NUMBER,
-                            consent: true,
-                            consumers: [
-                                {
-                                    consumerContent: {
-                                        wa: phoneNumber,
-                                    },
-                                    variables: {
-                                        '1': 'confirmacion_compra',
-                                        '2': 'numero_pedido',
-                                    },
+                    } = await axios.post(`${API_BASE_URL}/v1/campaigns/proactive`, {
+                        account: ACCOUNT_ID,
+                        campaignName,
+                        skill: 'WhatsApp',
+                        templateId,
+                        outboundNumber: OUTBOUND_NUMBER,
+                        consent: true,
+                        consumers: [
+                            {
+                                consumerContent: {
+                                    wa: phoneNumber,
                                 },
-                            ],
-                        },
+                                ...(variablesNumber > 0 ? { variables: parsedVariables } : {}),
+                            },
+                        ],
+                    }, {
+                        headers: { Authorization: `Bearer ${access_token}` },
                     })
                         .then((response) => {
-                            const { data } = response;
+                            const { data, status } = response;
                             if (
-                                data &&
-                                data.meta &&
-                                data.meta.httpStatus === '200 - OK' &&
-                                data.result &&
-                                data.result.FECHA_INSATISFACCION
-                            ) {
-                                return { success: true, satisfied: false };
-                            } else {
-                                return { success: true, satisfied: true };
+                                status === 200
+                                && data
+                                && data.acceptedConsumers
+                                && data.acceptedConsumers.length
+                            ) return { success: true };
+                            else {
+                                specialConsoleLog('CAMPAIGN_REQUEST_DID_NOT_SUCCEED', { ...data, statusCode: status });
+                                return { success: false };
                             }
                         })
                         .catch((err) => {
-                            if (
-                                err.response &&
-                                err.response.data &&
-                                err.response.data.meta &&
-                                err.response.data.meta.httpStatus === '404 - Not Found'
-                            ) {
-                                return { success: true, satisfied: true };
-                            } else {
-                                specialConsoleLog(customerId!, 'DATA_REQUEST_FAILED', err.response);
-                                return { success: false, satisfied: false };
-                            }
+                            specialConsoleLog('CAMPAIGN_REQUEST_FAILED', err.response);
+                            return { success: false };
                         });
                     
                     return res.send(result);
@@ -215,24 +220,24 @@ const stop = (req: any, res: any) => {
     res.send(200, 'Stop');
 };
 
-function millisToMinutesAndSeconds(millis: number): string {
-    const minutes = Math.floor(millis / 60000);
-    const seconds = ((millis % 60000) / 1000).toFixed(0);
-    return Number(seconds) == 60 ? minutes + 1 + 'm' : minutes + 'm ' + (Number(seconds) < 10 ? '0' : '') + seconds + 's';
-}
-
 function specialConsoleLog (
-    customerId: string,
     eventName: string,
     data: any,
 ): void {
     const now = new Date();
     const todayDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
     const currentTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-
     const jsonifiedData = JSON.stringify(data);
+    console.log(`${todayDate}|${currentTime}|${eventName}|${jsonifiedData}`);
+}
 
-    console.log(`${todayDate}|${currentTime}|${customerId}|${eventName}|${jsonifiedData}`);
+function deserializeString(str: string) {
+    const result: {[variableName: string]: string} = {};
+    str.split(';').forEach(pair => {
+        const [key, ...rest] = pair.split('=');
+        result[key] = rest.join('='); // Handles '=' inside the value
+    });
+    return result;
 }
 
 export default {

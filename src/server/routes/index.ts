@@ -32,7 +32,6 @@ const configJson = async (req: any, res: any) => {
 		SALESFORCE_APPLICATION_EXTENSION_KEY,
 		THIS_SERVER_BASE_URL,
 	} = process.env;
-	configJsonFile.lang["en-US"].name = 'Enviar WhatsApp a cliente';
 	configJsonFile.configurationArguments.applicationExtensionKey = SALESFORCE_APPLICATION_EXTENSION_KEY || 'NOT_PROVIDED';
 	configJsonFile.arguments.execute.url = `${THIS_SERVER_BASE_URL}/journeybuilder/execute`;
 	configJsonFile.configurationArguments.save.url = `${THIS_SERVER_BASE_URL}/journeybuilder/save`;
