@@ -44,6 +44,7 @@ define(['postmonger'], (Postmonger) => {
             const parsedVariables = deserializeString(variablesArg.variables);
             let numberOfItems = 0;
             for (const parsedVariable in parsedVariables) {
+                numberOfItems++;
                 const itemNumber = String(numberOfItems);
 
                 const groupDiv = document.createElement('div');
