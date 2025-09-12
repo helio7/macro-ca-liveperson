@@ -78,6 +78,9 @@ define(['postmonger'], (Postmonger) => {
         ];
 
         activity['metaData'].isConfigured = true;
+
+        console.log('activity before triggering updateActivity:', activity);
+
         connection.trigger('updateActivity', activity);
     });
 

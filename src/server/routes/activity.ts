@@ -148,26 +148,32 @@ const execute = async function (req: Request, res: Response) {
                     const { data: { access_token } } = authenticationResponse!;
 
                     let result: { success: boolean };
-                    
-                    try {
-                        const { data, status } = await axios.post(`${API_BASE_URL}/v1/campaigns/proactive`, {
-                            account: ACCOUNT_ID,
-                            campaignName,
-                            skill: 'WhatsApp',
-                            templateId,
-                            outboundNumber: OUTBOUND_NUMBER,
-                            consent: true,
-                            consumers: [
-                                {
-                                    consumerContent: {
-                                        wa: phoneNumber,
-                                    },
-                                    ...(variablesNumber > 0 ? { variables: parsedVariables } : {}),
+
+                    const requestJsonBody = {
+                        account: ACCOUNT_ID,
+                        campaignName,
+                        skill: 'WhatsApp',
+                        templateId,
+                        outboundNumber: OUTBOUND_NUMBER,
+                        consent: true,
+                        consumers: [
+                            {
+                                consumerContent: {
+                                    wa: phoneNumber,
                                 },
-                            ],
-                        }, {
-                            headers: { Authorization: `Bearer ${access_token}` },
-                        });
+                                ...(variablesNumber > 0 ? { variables: parsedVariables } : {}),
+                            },
+                        ],
+                    };
+
+                    console.log('CAMPAIGN_REQUEST_BODY:');
+                    console.dir(requestJsonBody, { depth: null });
+                    try {
+                        const { data, status } = await axios.post(
+                            `${API_BASE_URL}/v1/campaigns/proactive`,
+                            requestJsonBody,
+                            { headers: { Authorization: `Bearer ${access_token}` } },
+                        );
                         if (status === 200 && data?.acceptedConsumers?.length) {
                             result = { success: true };
                         } else {
@@ -180,6 +186,7 @@ const execute = async function (req: Request, res: Response) {
                                 status: err.response.status,
                                 data: err.response.data,
                             });
+                            console.dir(err.response.data, { depth: null });
                         } else if (err.request) {
                             console.error('CAMPAIGN_REQUEST_FAILED - No response received', err.request);
                         } else {
