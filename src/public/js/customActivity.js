@@ -57,7 +57,7 @@ define(['postmonger'], (Postmonger) => {
                 input.type = 'text';
                 input.name = 'dataExtensionColumnName';
                 input.placeholder = 'Nombre de columna en D.E.';
-                input.value = parsedVariables[parsedVariable];
+                input.value = parsedVariables[parsedVariable].split('.').pop()?.replace('}}', '');
                 input.className = 'text-input';
                 input.setAttribute('required', '');
 
