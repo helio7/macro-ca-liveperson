@@ -42,12 +42,11 @@ define(['postmonger'], (Postmonger) => {
         const phoneNumberArg = inArguments.find(arg => arg.phoneNumber);
         if (phoneNumberArg) document.getElementById('phoneNumber').value = phoneNumberArg.phoneNumber;
 
-        const variablesArg = inArguments.find(arg => arg.fields);
+        const variablesArg = inArguments.find(arg => arg.variables);
         if (variablesArg) {
             const parsedVariables = deserializeString(variablesArg.variables);
             for (const parsedVariable in parsedVariables) {
                 addItem(
-                    parsedVariable,
                     parsedVariables[parsedVariable],
                 );
             }

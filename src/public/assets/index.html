@@ -50,7 +50,7 @@
                     <fieldset id="variables-fieldset">
                         <legend>Variables</legend>
                         <div>
-                            <button onclick="addItem('', '')">Agregar Variable</button>
+                            <button onclick="addItem('')">Agregar Variable</button>
                             <button hidden id="button-that-removes-items" onclick="removeLastItem()">Quitar Variable</button>
                         </div>
                     </fieldset>
@@ -71,7 +71,7 @@
                 document.getElementById('button-that-removes-items').hidden = true;
             }
         }
-        const addItem = (variableName, dataExtensionColumnName) => {
+        const addItem = (dataExtensionColumnName) => {
             numberOfItems++;
 
             const itemNumber = String(numberOfItems);
