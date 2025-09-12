@@ -39,16 +39,38 @@ define(['postmonger'], (Postmonger) => {
         const templateIdArg = inArguments.find(arg => arg.templateId);
         if (templateIdArg) document.getElementById('templateId').value = templateIdArg.templateId;
 
-        const phoneNumberArg = inArguments.find(arg => arg.phoneNumber);
-        if (phoneNumberArg) document.getElementById('phoneNumber').value = phoneNumberArg.phoneNumber;
-
         const variablesArg = inArguments.find(arg => arg.variables);
         if (variablesArg) {
             const parsedVariables = deserializeString(variablesArg.variables);
+            let numberOfItems = 0;
             for (const parsedVariable in parsedVariables) {
-                addItem(
-                    parsedVariables[parsedVariable],
-                );
+                const itemNumber = String(numberOfItems);
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'variable-item';
+                groupDiv.id = 'group-' + itemNumber;
+
+                const span = document.createElement('span');
+                span.innerText = 'Variable ' + itemNumber + ':';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = 'dataExtensionColumnName';
+                input.placeholder = 'Nombre de columna en D.E.';
+                input.value = parsedVariables[parsedVariable];
+                input.className = 'text-input';
+                input.setAttribute('required', '');
+
+                groupDiv.appendChild(span);
+                groupDiv.appendChild(input);
+
+                const variablesFieldset = document.getElementById('variables-fieldset');
+
+                variablesFieldset.appendChild(groupDiv);
+
+                if (numberOfItems === 1) {
+                    document.getElementById('button-that-removes-items').hidden = false;
+                }
             }
         }
     });

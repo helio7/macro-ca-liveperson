@@ -160,8 +160,8 @@ const execute = async function (req: Request, res: Response) {
                             {
                                 consumerContent: {
                                     wa: phoneNumber,
+                                    ...(variablesNumber > 0 ? { variables: parsedVariables } : {}),
                                 },
-                                ...(variablesNumber > 0 ? { variables: parsedVariables } : {}),
                             },
                         ],
                     };
