@@ -138,7 +138,7 @@ const execute = async function (req: Request, res: Response) {
                         .catch((err) => {
                             if (err.response) {
                                 const { data, status } = err.response;
-                                specialConsoleLog('AUTHENTICATION_REQUEST_FAILED', { data, status });
+                                console.log('AUTHENTICATION_REQUEST_FAILED', { data, status });
                             }
                             console.log('Error when calling the authentication API.');
                             return null;
@@ -147,44 +147,47 @@ const execute = async function (req: Request, res: Response) {
                     
                     const { data: { access_token } } = authenticationResponse!;
 
-                    const result: {
-                        success: boolean,
-                    } = await axios.post(`${API_BASE_URL}/v1/campaigns/proactive`, {
-                        account: ACCOUNT_ID,
-                        campaignName,
-                        skill: 'WhatsApp',
-                        templateId,
-                        outboundNumber: OUTBOUND_NUMBER,
-                        consent: true,
-                        consumers: [
-                            {
-                                consumerContent: {
-                                    wa: phoneNumber,
-                                },
-                                ...(variablesNumber > 0 ? { variables: parsedVariables } : {}),
-                            },
-                        ],
-                    }, {
-                        headers: { Authorization: `Bearer ${access_token}` },
-                    })
-                        .then((response) => {
-                            const { data, status } = response;
-                            if (
-                                status === 200
-                                && data
-                                && data.acceptedConsumers
-                                && data.acceptedConsumers.length
-                            ) return { success: true };
-                            else {
-                                specialConsoleLog('CAMPAIGN_REQUEST_DID_NOT_SUCCEED', { ...data, statusCode: status });
-                                return { success: false };
-                            }
-                        })
-                        .catch((err) => {
-                            specialConsoleLog('CAMPAIGN_REQUEST_FAILED', err.response);
-                            return { success: false };
-                        });
+                    let result: { success: boolean };
                     
+                    try {
+                        const { data, status } = await axios.post(`${API_BASE_URL}/v1/campaigns/proactive`, {
+                            account: ACCOUNT_ID,
+                            campaignName,
+                            skill: 'WhatsApp',
+                            templateId,
+                            outboundNumber: OUTBOUND_NUMBER,
+                            consent: true,
+                            consumers: [
+                                {
+                                    consumerContent: {
+                                        wa: phoneNumber,
+                                    },
+                                    ...(variablesNumber > 0 ? { variables: parsedVariables } : {}),
+                                },
+                            ],
+                        }, {
+                            headers: { Authorization: `Bearer ${access_token}` },
+                        });
+                        if (status === 200 && data?.acceptedConsumers?.length) {
+                            result = { success: true };
+                        } else {
+                            console.warn('CAMPAIGN_REQUEST_DID_NOT_SUCCEED', { ...data, statusCode: status });
+                            result = { success: false };
+                        }
+                    } catch (err: any) {
+                        if (err.response) {
+                            console.error('CAMPAIGN_REQUEST_FAILED - Server error', {
+                                status: err.response.status,
+                                data: err.response.data,
+                            });
+                        } else if (err.request) {
+                            console.error('CAMPAIGN_REQUEST_FAILED - No response received', err.request);
+                        } else {
+                            console.error('CAMPAIGN_REQUEST_FAILED - Unexpected error', err.message);
+                        }
+                        result = { success: false };
+                    }
+
                     return res.send(result);
                 } else {
                     console.error('inArguments invalid.');
@@ -219,16 +222,6 @@ const stop = (req: any, res: any) => {
     logData(req);
     res.send(200, 'Stop');
 };
-
-function specialConsoleLog (
-    eventName: string,
-    data: any,
-): void {
-    const now = new Date();
-    const todayDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-    const currentTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-    console.log(`${todayDate}|${currentTime}|${eventName}|${data}`);
-}
 
 function deserializeString(str: string) {
     const result: {[variableName: string]: string} = {};
