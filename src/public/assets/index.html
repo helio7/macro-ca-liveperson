@@ -61,20 +61,23 @@
     <script>
         let numberOfItems = 0;
         const removeLastItem = () => {
-            const itemNumber = String(numberOfItems);
-            const groupDivToRemove = document.getElementById('group-' + itemNumber);
-            groupDivToRemove.remove();
+            const numberOfItems = document.querySelectorAll('.variable-item').length;
 
-            numberOfItems--;
-
-            if (numberOfItems === 0) {
+            if (numberOfItems === 1) {
                 document.getElementById('button-that-removes-items').hidden = true;
             }
+
+            const groupDivToRemove = document.getElementById('group-' + String(numberOfItems));
+            groupDivToRemove.remove();
         }
         const addItem = (dataExtensionColumnName) => {
-            numberOfItems++;
+            const numberOfItems = document.querySelectorAll('.variable-item').length;
 
-            const itemNumber = String(numberOfItems);
+            if (numberOfItems === 0) {
+                document.getElementById('button-that-removes-items').hidden = false;
+            }
+
+            const itemNumber = String(numberOfItems + 1);
 
             const groupDiv = document.createElement('div');
             groupDiv.className = 'variable-item';
@@ -97,10 +100,6 @@
             const variablesFieldset = document.getElementById('variables-fieldset');
 
             variablesFieldset.appendChild(groupDiv);
-
-            if (numberOfItems === 1) {
-                document.getElementById('button-that-removes-items').hidden = false;
-            }
         }
     </script>
 </html>
