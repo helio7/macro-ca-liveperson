@@ -117,7 +117,7 @@ const execute = async function (req: Request, res: Response) {
                     console.log('UNPARSED VARIABLES:', variables);
 
                     const parsedVariables = deserializeString(variables);
-                    console.log('PARSED VARIABLES:', variables);
+                    console.log('PARSED VARIABLES:', parsedVariables);
 
                     const variablesNumber = Object.keys(parsedVariables).length;
                     if (variablesNumber) {
@@ -227,8 +227,7 @@ function specialConsoleLog (
     const now = new Date();
     const todayDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
     const currentTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-    const jsonifiedData = JSON.stringify(data);
-    console.log(`${todayDate}|${currentTime}|${eventName}|${jsonifiedData}`);
+    console.log(`${todayDate}|${currentTime}|${eventName}|${data}`);
 }
 
 function deserializeString(str: string) {
