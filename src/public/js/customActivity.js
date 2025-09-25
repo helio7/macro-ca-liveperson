@@ -80,7 +80,7 @@ define(['postmonger'], (Postmonger) => {
         const dataExtension = document.getElementById('dataExtension').value;
         const campaignName = document.getElementById('campaignName').value;
         const templateId = document.getElementById('templateId').value;
-        const phoneNumber = `{{Contact.Attribute."${dataExtension}".phoneNumber}}`;
+        const phoneNumber = `{{Contact.Attribute."${dataExtension}".TELEFONO}}`;
 
         const groupDivs = document.querySelectorAll('.variable-item');
         const variablesObject = {};
