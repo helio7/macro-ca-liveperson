@@ -175,6 +175,7 @@ const execute = async function (req: Request, res: Response) {
                             { headers: { Authorization: `Bearer ${access_token}` } },
                         );
                         if (status === 200 && data?.acceptedConsumers?.length) {
+                            console.log(`Success for ${phoneNumber}`);
                             result = { success: true };
                         } else {
                             console.warn('CAMPAIGN_REQUEST_DID_NOT_SUCCEED', { ...data, statusCode: status });
