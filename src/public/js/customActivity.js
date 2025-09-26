@@ -81,7 +81,7 @@ define(['postmonger'], (Postmonger) => {
 
     connection.on('clickedNext', () => { // Save function within MC.
         const dataExtension = document.getElementById('dataExtension').value;
-        const dataExtensionPhoneNumberColumnNameArg = document.getElementById('dataExtensionPhoneNumberColumnNameArg').value;
+        const dataExtensionPhoneNumberColumnNameArg = document.getElementById('dataExtensionPhoneNumberColumnName').value;
         const campaignName = document.getElementById('campaignName').value;
         const templateId = document.getElementById('templateId').value;
         const phoneNumber = `{{Contact.Attribute."${dataExtension}".${dataExtensionPhoneNumberColumnNameArg}}}`;
