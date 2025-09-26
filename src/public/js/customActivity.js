@@ -81,10 +81,10 @@ define(['postmonger'], (Postmonger) => {
 
     connection.on('clickedNext', () => { // Save function within MC.
         const dataExtension = document.getElementById('dataExtension').value;
-        const dataExtensionPhoneNumberColumnNameArg = document.getElementById('dataExtensionPhoneNumberColumnName').value;
+        const dataExtensionPhoneNumberColumnName = document.getElementById('dataExtensionPhoneNumberColumnName').value;
         const campaignName = document.getElementById('campaignName').value;
         const templateId = document.getElementById('templateId').value;
-        const phoneNumber = `{{Contact.Attribute."${dataExtension}".${dataExtensionPhoneNumberColumnNameArg}}}`;
+        const phoneNumber = `{{Contact.Attribute."${dataExtension}".${dataExtensionPhoneNumberColumnName}}}`;
 
         const groupDivs = document.querySelectorAll('.variable-item');
         const variablesObject = {};
@@ -98,7 +98,7 @@ define(['postmonger'], (Postmonger) => {
 
         activity['arguments'].execute.inArguments = [
             { dataExtension: dataExtension ? dataExtension : null },
-            { dataExtensionPhoneNumberColumnNameArg: dataExtensionPhoneNumberColumnNameArg ? dataExtensionPhoneNumberColumnNameArg : null },
+            { dataExtensionPhoneNumberColumnName: dataExtensionPhoneNumberColumnName ? dataExtensionPhoneNumberColumnName : null },
             { campaignName: campaignName ? campaignName : null },
             { templateId: templateId ? templateId : null },
             { phoneNumber: phoneNumber ? phoneNumber : null },
