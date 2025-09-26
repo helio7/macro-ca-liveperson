@@ -17,6 +17,7 @@
         "execute": {
             "inArguments": [
                 { "dataExtension": "" },
+                { "dataExtensionPhoneNumberColumnName": "" },
                 { "campaignName": "" },
                 { "templateId": "" },
                 { "phoneNumber": "" },
@@ -72,6 +73,11 @@
                 "inArguments": [
                     {
                         "dataExtension": {
+                            "dataType": "Text",
+                            "isNullable": true,
+                            "direction": "in"
+                        },
+                        "dataExtensionPhoneNumberColumnName": {
                             "dataType": "Text",
                             "isNullable": true,
                             "direction": "in"

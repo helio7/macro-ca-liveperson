@@ -33,6 +33,9 @@ define(['postmonger'], (Postmonger) => {
         const dataExtensionArg = inArguments.find(arg => arg.dataExtension);
         if (dataExtensionArg) document.getElementById('dataExtension').value = dataExtensionArg.dataExtension;
 
+        const dataExtensionPhoneNumberColumnNameArg = inArguments.find(arg => arg.dataExtensionPhoneNumberColumnName);
+        if (dataExtensionPhoneNumberColumnNameArg) document.getElementById('dataExtensionPhoneNumberColumnName').value = dataExtensionPhoneNumberColumnNameArg.dataExtensionPhoneNumberColumnName;
+
         const campaignNameArg = inArguments.find(arg => arg.campaignName);
         if (campaignNameArg) document.getElementById('campaignName').value = campaignNameArg.campaignName;
 
@@ -78,9 +81,10 @@ define(['postmonger'], (Postmonger) => {
 
     connection.on('clickedNext', () => { // Save function within MC.
         const dataExtension = document.getElementById('dataExtension').value;
+        const dataExtensionPhoneNumberColumnNameArg = document.getElementById('dataExtensionPhoneNumberColumnNameArg').value;
         const campaignName = document.getElementById('campaignName').value;
         const templateId = document.getElementById('templateId').value;
-        const phoneNumber = `{{Contact.Attribute."${dataExtension}".TELEFONO}}`;
+        const phoneNumber = `{{Contact.Attribute."${dataExtension}".${dataExtensionPhoneNumberColumnNameArg}}}`;
 
         const groupDivs = document.querySelectorAll('.variable-item');
         const variablesObject = {};
@@ -94,6 +98,7 @@ define(['postmonger'], (Postmonger) => {
 
         activity['arguments'].execute.inArguments = [
             { dataExtension: dataExtension ? dataExtension : null },
+            { dataExtensionPhoneNumberColumnNameArg: dataExtensionPhoneNumberColumnNameArg ? dataExtensionPhoneNumberColumnNameArg : null },
             { campaignName: campaignName ? campaignName : null },
             { templateId: templateId ? templateId : null },
             { phoneNumber: phoneNumber ? phoneNumber : null },
