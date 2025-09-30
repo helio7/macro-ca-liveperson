@@ -44,36 +44,38 @@ define(['postmonger'], (Postmonger) => {
 
         const variablesArg = inArguments.find(arg => arg.variables);
         if (variablesArg) {
-            const parsedVariables = deserializeString(variablesArg.variables);
-            let numberOfItems = 0;
-            for (const parsedVariable in parsedVariables) {
-                numberOfItems++;
-                const itemNumber = String(numberOfItems);
+            if (variablesArg.variables !== 'NO_VARIABLES') {
+                const parsedVariables = deserializeString(variablesArg.variables);
+                let numberOfItems = 0;
+                for (const parsedVariable in parsedVariables) {
+                    numberOfItems++;
+                    const itemNumber = String(numberOfItems);
 
-                const groupDiv = document.createElement('div');
-                groupDiv.className = 'variable-item';
-                groupDiv.id = 'group-' + itemNumber;
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'variable-item';
+                    groupDiv.id = 'group-' + itemNumber;
 
-                const span = document.createElement('span');
-                span.innerText = 'Variable ' + itemNumber + ':';
+                    const span = document.createElement('span');
+                    span.innerText = 'Variable ' + itemNumber + ':';
 
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.name = 'dataExtensionColumnName';
-                input.placeholder = 'Nombre de columna en D.E.';
-                input.value = parsedVariables[parsedVariable].split('.').pop()?.replace('}}', '');
-                input.className = 'text-input';
-                input.setAttribute('required', '');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.name = 'dataExtensionColumnName';
+                    input.placeholder = 'Nombre de columna en D.E.';
+                    input.value = parsedVariables[parsedVariable].split('.').pop()?.replace('}}', '');
+                    input.className = 'text-input';
+                    input.setAttribute('required', '');
 
-                groupDiv.appendChild(span);
-                groupDiv.appendChild(input);
+                    groupDiv.appendChild(span);
+                    groupDiv.appendChild(input);
 
-                const variablesFieldset = document.getElementById('variables-fieldset');
+                    const variablesFieldset = document.getElementById('variables-fieldset');
 
-                variablesFieldset.appendChild(groupDiv);
+                    variablesFieldset.appendChild(groupDiv);
 
-                if (numberOfItems === 1) {
-                    document.getElementById('button-that-removes-items').hidden = false;
+                    if (numberOfItems === 1) {
+                        document.getElementById('button-that-removes-items').hidden = false;
+                    }
                 }
             }
         }
@@ -94,7 +96,7 @@ define(['postmonger'], (Postmonger) => {
             const dataExtensionColumnName = input.value;
             variablesObject[variableNumber] = `{{Contact.Attribute."${dataExtension}".${dataExtensionColumnName}}}`;
         }
-        const variables = serializeObject(variablesObject);
+        const variables = groupDivs.length ? serializeObject(variablesObject) : 'NO_VARIABLES';
 
         activity['arguments'].execute.inArguments = [
             { dataExtension: dataExtension ? dataExtension : null },

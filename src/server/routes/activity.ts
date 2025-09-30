@@ -116,17 +116,6 @@ const execute = async function (req: Request, res: Response) {
                     console.log('PHONE NUMBER:', phoneNumber);
                     console.log('UNPARSED VARIABLES:', variables);
 
-                    const parsedVariables = deserializeString(variables);
-                    console.log('PARSED VARIABLES:', parsedVariables);
-
-                    const variablesNumber = Object.keys(parsedVariables).length;
-                    if (variablesNumber) {
-                        // Check for null, undefined, or empty string values in parsedVariables
-                        for (const [key, value] of Object.entries(parsedVariables)) {
-                            if (!value) return res.status(400).send(`Value for variable "${key}" is invalid: ${value}.`);
-                        }
-                    }
-
                     const params = new URLSearchParams();
                     params.append('scope', 'openid');
                     params.append('grant_type', 'client_credentials');
@@ -147,24 +136,50 @@ const execute = async function (req: Request, res: Response) {
                     
                     const { data: { access_token } } = authenticationResponse!;
 
-                    let result: { success: boolean };
-
-                    const requestJsonBody = {
-                        account: ACCOUNT_ID,
+                    const requestJsonBody: {
+                        account: string;
+                        campaignName: string;
+                        skill: 'WhatsApp';
+                        templateId: string;
+                        outboundNumber: string;
+                        consent: true;
+                        consumers: {
+                            consumerContent: {
+                                wa: string;
+                                variables?: Record<string, string>;
+                            };
+                        }[];
+                    } = {
+                        account: ACCOUNT_ID!,
                         campaignName,
                         skill: 'WhatsApp',
                         templateId,
-                        outboundNumber: OUTBOUND_NUMBER,
+                        outboundNumber: OUTBOUND_NUMBER!,
                         consent: true,
                         consumers: [
                             {
                                 consumerContent: {
                                     wa: phoneNumber,
-                                    ...(variablesNumber > 0 ? { variables: parsedVariables } : {}),
                                 },
                             },
                         ],
                     };
+
+                    if (variables !== 'NO_VARIABLES') {
+                        const parsedVariables = deserializeString(variables);
+                        console.log('PARSED VARIABLES:', parsedVariables);
+
+                        const variablesNumber = Object.keys(parsedVariables).length;
+                        if (variablesNumber) {
+                            // Check for null, undefined, or empty string values in parsedVariables
+                            for (const [key, value] of Object.entries(parsedVariables)) {
+                                if (!value) return res.status(400).send(`Value for variable "${key}" is invalid: ${value}.`);
+                            }
+                            requestJsonBody.consumers[0].consumerContent.variables = parsedVariables;
+                        }
+                    }
+
+                    let result: { success: boolean };
 
                     console.log('CAMPAIGN_REQUEST_BODY:');
                     console.dir(requestJsonBody, { depth: null });
