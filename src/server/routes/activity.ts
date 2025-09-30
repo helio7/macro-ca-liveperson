@@ -64,6 +64,7 @@ const {
         AUTH_SECRET,
         ACCOUNT_ID,
         OUTBOUND_NUMBER,
+        API_HOST,
     },
 } = process;
 
@@ -128,8 +129,11 @@ const execute = async function (req: Request, res: Response) {
                         const { data, status } = await axios.post(
                             `${API_BASE_URL}/v1/oauth/access`,
                             params,
-                            { auth: { username: AUTH_KEY!, password: AUTH_SECRET! },
-                        });
+                            {
+                                auth: { username: AUTH_KEY!, password: AUTH_SECRET! },
+                                headers: { Host: API_HOST! },
+                            },
+                        );
                         if (status !== 200) {
                             console.warn('AUTHENTICATION_REQUEST_DID_NOT_SUCCEED', { ...data, statusCode: status });
                             result = { success: false };
@@ -202,7 +206,7 @@ const execute = async function (req: Request, res: Response) {
                         const { data, status } = await axios.post(
                             `${API_BASE_URL}/v1/campaigns/proactive`,
                             requestJsonBody,
-                            { headers: { Authorization: `Bearer ${access_token}` } },
+                            { headers: { Authorization: `Bearer ${access_token}`, Host: API_HOST! } },
                         );
                         if (status === 200 && data?.acceptedConsumers?.length) {
                             console.log(`Success for ${phoneNumber}`);
