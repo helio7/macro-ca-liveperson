@@ -116,23 +116,40 @@ const execute = async function (req: Request, res: Response) {
                     console.log('PHONE NUMBER:', phoneNumber);
                     console.log('UNPARSED VARIABLES:', variables);
 
+                    let authenticationResponse: { data: { access_token: string } } | null;
+
                     const params = new URLSearchParams();
                     params.append('scope', 'openid');
                     params.append('grant_type', 'client_credentials');
-                    const authenticationResponse: { data: { access_token: string } } | null = await axios.post(
-                        `${API_BASE_URL}/v1/oauth/access`,
-                        params,
-                        { auth: { username: AUTH_KEY!, password: AUTH_SECRET! },
-                    })
-                        .catch((err) => {
-                            if (err.response) {
-                                const { data, status } = err.response;
-                                console.log('AUTHENTICATION_REQUEST_FAILED', { data, status });
-                            }
-                            console.log('Error when calling the authentication API.');
-                            return null;
+
+                    let result: { success: boolean };
+
+                    try {
+                        const { data, status } = await axios.post(
+                            `${API_BASE_URL}/v1/oauth/access`,
+                            params,
+                            { auth: { username: AUTH_KEY!, password: AUTH_SECRET! },
                         });
-                    if (!authenticationResponse) return res.send({ success: false });
+                        if (status !== 200) {
+                            console.warn('AUTHENTICATION_REQUEST_DID_NOT_SUCCEED', { ...data, statusCode: status });
+                            result = { success: false };
+                        }
+                    } catch (err: any) {
+                        if (err.response) {
+                            console.error('AUTHENTICATION_REQUEST_FAILED - Server error', {
+                                status: err.response.status,
+                                data: err.response.data,
+                            });
+                            console.dir(err.response.data, { depth: null });
+                        } else if (err.request) {
+                            console.error('AUTHENTICATION_REQUEST_FAILED - No response received', err.request);
+                        } else {
+                            console.error('AUTHENTICATION_REQUEST_FAILED - Unexpected error', err.message);
+                        }
+                        result = { success: false };
+                    }
+
+                    if (!result!.success) return res.send(result!);
                     
                     const { data: { access_token } } = authenticationResponse!;
 
@@ -178,8 +195,6 @@ const execute = async function (req: Request, res: Response) {
                             requestJsonBody.consumers[0].consumerContent.variables = parsedVariables;
                         }
                     }
-
-                    let result: { success: boolean };
 
                     console.log('CAMPAIGN_REQUEST_BODY:');
                     console.dir(requestJsonBody, { depth: null });
