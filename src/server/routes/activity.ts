@@ -240,6 +240,48 @@ const execute = async function (req: Request, res: Response) {
     );
 };
 
+const test = async function (req: Request, res: Response) {
+    console.log('Request received. Body:', req.body);
+
+    let accessToken: string | null = null;
+
+    const params = new URLSearchParams();
+    params.append('scope', 'openid');
+    params.append('grant_type', 'client_credentials');
+
+    try {
+        const { data, status } = await axios.post(
+            `${API_BASE_URL}/v1/oauth/access`,
+            params,
+            {
+                auth: { username: AUTH_KEY!, password: AUTH_SECRET! },
+                headers: { Host: API_HOST! },
+            },
+        );
+        if (status !== 200) {
+            console.warn('AUTHENTICATION_REQUEST_DID_NOT_SUCCEED', { ...data, statusCode: status });
+            return res.send({ success: false });
+        }
+        accessToken = data.access_token;
+    } catch (err: any) {
+        if (err.response) {
+            console.error('AUTHENTICATION_REQUEST_FAILED - Server error', {
+                status: err.response.status,
+                data: err.response.data,
+            });
+            console.dir(err.response.data, { depth: null });
+        } else if (err.request) {
+            // console.error('AUTHENTICATION_REQUEST_FAILED - No response received', err.request);
+            console.error('AUTHENTICATION_REQUEST_FAILED - No response received', err);
+        } else {
+            console.error('AUTHENTICATION_REQUEST_FAILED - Unexpected error', err.message);
+        }
+        return res.send({ success: false });
+    }
+
+    res.send(200);
+};
+
 const edit = (req: any, res: any) => {
     logData(req);
     res.send(200, 'Edit');
