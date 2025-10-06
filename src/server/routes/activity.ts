@@ -324,4 +324,5 @@ export default {
     publish,
     validate,
     stop,
+    test,
 };
