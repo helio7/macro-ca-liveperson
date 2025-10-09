@@ -30,14 +30,14 @@ const logout = (req: any, res: any) => {
 const configJson = async (req: any, res: any) => {
 	const {
 		SALESFORCE_APPLICATION_EXTENSION_KEY,
-		THIS_SERVER_BASE_URL,
+		ENDPOINTS_BASE_URL,
 	} = process.env;
 	configJsonFile.configurationArguments.applicationExtensionKey = SALESFORCE_APPLICATION_EXTENSION_KEY || 'NOT_PROVIDED';
-	configJsonFile.arguments.execute.url = `${THIS_SERVER_BASE_URL}/journeybuilder/execute`;
-	configJsonFile.configurationArguments.save.url = `${THIS_SERVER_BASE_URL}/journeybuilder/save`;
-	configJsonFile.configurationArguments.publish.url = `${THIS_SERVER_BASE_URL}/journeybuilder/publish`;
-	configJsonFile.configurationArguments.stop.url = `${THIS_SERVER_BASE_URL}/journeybuilder/stop`;
-	configJsonFile.configurationArguments.validate.url = `${THIS_SERVER_BASE_URL}/journeybuilder/validate`;
+	configJsonFile.arguments.execute.url = `${ENDPOINTS_BASE_URL}/journeybuilder/execute`;
+	configJsonFile.configurationArguments.save.url = `${ENDPOINTS_BASE_URL}/journeybuilder/save`;
+	configJsonFile.configurationArguments.publish.url = `${ENDPOINTS_BASE_URL}/journeybuilder/publish`;
+	configJsonFile.configurationArguments.stop.url = `${ENDPOINTS_BASE_URL}/journeybuilder/stop`;
+	configJsonFile.configurationArguments.validate.url = `${ENDPOINTS_BASE_URL}/journeybuilder/validate`;
 	res.json(configJsonFile);
 };
 

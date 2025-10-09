@@ -71,7 +71,25 @@ const {
 const execute = async function (req: Request, res: Response) {
     const { body } = req;
 
-    console.log('POST /execute request received.');
+    console.log('"POST /execute" REQUEST RECEIVED', {
+        body: req.body,
+        headers: req.headers,
+        trailers: req.trailers,
+        method: req.method,
+        url: req.url,
+        params: req.params,
+        query: req.query,
+        route: req.route,
+        cookies: req.cookies,
+        ip: req.ip,
+        path: req.path,
+        host: req.host,
+        fresh: req.fresh,
+        stale: req.stale,
+        protocol: req.protocol,
+        secure: req.secure,
+        originalUrl: req.originalUrl
+    });
 
     if (!body) {
         console.error(new Error('invalid jwtdata'));
